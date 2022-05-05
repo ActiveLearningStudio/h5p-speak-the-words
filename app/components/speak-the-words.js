@@ -148,6 +148,7 @@ export default class {
     this.question.setFeedback(decode(feedbackText), 1, 1);
     this.question.hideButton('try-again');
     this.question.hideButton('show-solution');
+    this.triggerXAPIConsumed();
     this.question.triggerXAPIScored(1, 1, 'answered', true, true);
     this.hasAnswered = true;
     this.score = 1;
@@ -167,9 +168,36 @@ export default class {
     this.question.setFeedback(decode(feedbackText), 0, 1);
     this.question.showButton('try-again');
     this.question.showButton('show-solution');
+    this.triggerXAPIConsumed();
+    // H5P.ContinuousText.prototype.triggerConsumed = function () {
+    // };
     this.question.triggerXAPIScored(0, 1, 'answered', true, false);
     this.hasAnswered = true;
     this.score = 0;
+  }
+
+  /**
+   * Trigger the XAPI Consumed
+   */
+   triggerXAPIConsumed() {
+    var xAPIEvent = this.question.createXAPIEventTemplate({
+      id: 'http://activitystrea.ms/schema/1.0/consume',
+      display: {
+        'en-US': 'consumed'
+      }
+    }, {
+      result: {
+        completion: true
+      }
+    });
+  
+    Object.assign(xAPIEvent.data.statement.object.definition, {
+      name:{
+        'en-US': "Speak The Words"
+      }
+    });
+  
+    this.question.trigger(xAPIEvent);
   }
 
   /**
